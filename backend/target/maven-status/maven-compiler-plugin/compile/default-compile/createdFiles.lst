@@ -1,0 +1,14 @@
+com\wealthbridge\repository\UserRepository.class
+com\wealthbridge\security\JwtAuthenticationFilter.class
+com\wealthbridge\security\CustomUserDetailsService.class
+com\wealthbridge\config\SecurityConfig.class
+com\wealthbridge\dto\AuthResponse$AuthResponseBuilder.class
+com\wealthbridge\dto\SignupRequest.class
+com\wealthbridge\model\User.class
+com\wealthbridge\controller\AuthController.class
+com\wealthbridge\WealthBridgeApplication.class
+com\wealthbridge\controller\HealthController.class
+com\wealthbridge\dto\LoginRequest.class
+com\wealthbridge\security\JwtTokenProvider.class
+com\wealthbridge\dto\AuthResponse.class
+com\wealthbridge\model\User$UserBuilder.class
