@@ -1,5 +1,7 @@
 import { createContext, useContext, useState, useEffect } from 'react';
 
+const API = import.meta.env.VITE_API_URL || 'http://localhost:8080';
+
 const AuthContext = createContext();
 
 const INITIAL_FINANCIAL_DATA = {
@@ -110,7 +112,7 @@ export function AuthProvider({ children }) {
     const fetchFinancialData = async (token) => {
         try {
             // First fetch profile
-            const profileRes = await fetch('http://localhost:8080/api/profile', {
+            const profileRes = await fetch(`${API}/api/profile`, {
                 headers: { 'Authorization': `Bearer ${token}` }
             });
 
@@ -118,7 +120,7 @@ export function AuthProvider({ children }) {
                 const profile = await profileRes.json();
 
                 // Then fetch goals
-                const goalsRes = await fetch('http://localhost:8080/api/goals', {
+                const goalsRes = await fetch(`${API}/api/goals`, {
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
 
@@ -143,7 +145,7 @@ export function AuthProvider({ children }) {
 
     const login = async (email, password) => {
         try {
-            const response = await fetch('http://localhost:8080/api/auth/login', {
+            const response = await fetch(`${API}/api/auth/login`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ email, password })
@@ -181,7 +183,7 @@ export function AuthProvider({ children }) {
 
     const signup = async (name, email, password) => {
         try {
-            const response = await fetch('http://localhost:8080/api/auth/signup', {
+            const response = await fetch(`${API}/api/auth/signup`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ fullName: name, email, password })
@@ -198,7 +200,7 @@ export function AuthProvider({ children }) {
                 setIsAuthenticated(true);
 
                 // Initialize empty profile in backend
-                await fetch('http://localhost:8080/api/profile', {
+                await fetch(`${API}/api/profile`, {
                     method: 'PUT',
                     headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${data.token}` },
                     body: JSON.stringify({
@@ -252,14 +254,14 @@ export function AuthProvider({ children }) {
         if (token && token !== 'demo-token') {
             try {
                 // Fetch existing first to preserve other fields
-                const profileRes = await fetch('http://localhost:8080/api/profile', {
+                const profileRes = await fetch(`${API}/api/profile`, {
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
 
                 if (profileRes.ok) {
                     const profile = await profileRes.json();
 
-                    await fetch('http://localhost:8080/api/profile', {
+                    await fetch(`${API}/api/profile`, {
                         method: 'PUT',
                         headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
                         body: JSON.stringify({
@@ -289,7 +291,7 @@ export function AuthProvider({ children }) {
         const token = localStorage.getItem('wb-token');
         if (token && token !== 'demo-token') {
             try {
-                const response = await fetch('http://localhost:8080/api/goals', {
+                const response = await fetch(`${API}/api/goals`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
                     body: JSON.stringify(goal)
@@ -321,7 +323,7 @@ export function AuthProvider({ children }) {
             try {
                 const goal = financialData.goals.find(g => g.id === id);
                 if (goal) {
-                    await fetch(`http://localhost:8080/api/goals/${id}`, {
+                    await fetch(`${API}/api/goals/${id}`, {
                         method: 'PUT',
                         headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
                         body: JSON.stringify({ ...goal, ...updates })
@@ -343,7 +345,7 @@ export function AuthProvider({ children }) {
         const token = localStorage.getItem('wb-token');
         if (token && token !== 'demo-token') {
             try {
-                await fetch(`http://localhost:8080/api/goals/${id}`, {
+                await fetch(`${API}/api/goals/${id}`, {
                     method: 'DELETE',
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
