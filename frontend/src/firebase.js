@@ -1,8 +1,20 @@
 import { initializeApp, getApps } from "firebase/app";
 import { getAuth, GoogleAuthProvider } from "firebase/auth";
 
+const apiKey = import.meta.env.VITE_FIREBASE_API_KEY;
+
+console.log("Firebase Env Keys Loaded:", {
+    apiKey: apiKey ? "Loaded" : "Missing",
+    domain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN ? "Loaded" : "Missing",
+    project: import.meta.env.VITE_FIREBASE_PROJECT_ID ? "Loaded" : "Missing"
+});
+
+if (!apiKey || apiKey === "missing-api-key") {
+    console.error("Firebase API Key is missing or invalid. Please check your .env file and restart the Vite dev server.");
+}
+
 const firebaseConfig = {
-    apiKey: import.meta.env.VITE_FIREBASE_API_KEY || "missing-api-key",
+    apiKey: apiKey || "missing-api-key",
     authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN || "missing-domain",
     projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID || "missing-project",
     storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET || "missing-bucket",
