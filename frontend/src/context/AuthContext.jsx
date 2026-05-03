@@ -265,10 +265,6 @@ export function AuthProvider({ children }) {
     };
 
     const googleLogin = async () => {
-        if (!auth) {
-            console.error("Firebase is not initialized. Please configure .env file.");
-            return { success: false, error: "Firebase not configured. Please check console." };
-        }
         try {
             let result;
             try {
