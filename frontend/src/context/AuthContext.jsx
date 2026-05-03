@@ -91,22 +91,24 @@ export function AuthProvider({ children }) {
         const loadUser = async () => {
             try {
                 // Check for redirect result first
-                const redirectResult = await getRedirectResult(auth).catch(err => {
-                    console.error("Redirect error", err);
-                    return null;
-                });
-                
-                if (redirectResult) {
-                    const firebaseUser = redirectResult.user;
-                    const userData = { id: firebaseUser.uid, name: firebaseUser.displayName || 'Google User', email: firebaseUser.email };
-                    localStorage.setItem('wb-token', firebaseUser.accessToken);
-                    localStorage.setItem('wb-user', JSON.stringify(userData));
+                if (auth) {
+                    const redirectResult = await getRedirectResult(auth).catch(err => {
+                        console.error("Redirect error", err);
+                        return null;
+                    });
                     
-                    setUser(userData);
-                    setIsAuthenticated(true);
-                    setFinancialData(INITIAL_FINANCIAL_DATA);
-                    setIsLoading(false);
-                    return;
+                    if (redirectResult) {
+                        const firebaseUser = redirectResult.user;
+                        const userData = { id: firebaseUser.uid, name: firebaseUser.displayName || 'Google User', email: firebaseUser.email };
+                        localStorage.setItem('wb-token', firebaseUser.accessToken);
+                        localStorage.setItem('wb-user', JSON.stringify(userData));
+                        
+                        setUser(userData);
+                        setIsAuthenticated(true);
+                        setFinancialData(INITIAL_FINANCIAL_DATA);
+                        setIsLoading(false);
+                        return;
+                    }
                 }
             } catch (error) {
                 console.error("Error during redirect check:", error);
@@ -263,6 +265,10 @@ export function AuthProvider({ children }) {
     };
 
     const googleLogin = async () => {
+        if (!auth) {
+            console.error("Firebase is not initialized. Please configure .env file.");
+            return { success: false, error: "Firebase not configured. Please check console." };
+        }
         try {
             let result;
             try {
