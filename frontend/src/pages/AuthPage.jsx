@@ -25,6 +25,7 @@ export default function AuthPage() {
     const handleSubmit = async (e) => {
         e.preventDefault();
         setError('');
+        console.log("Form submitted. isLogin:", isLogin);
 
         if (!isLogin && formData.password !== formData.confirmPassword) {
             setError('Passwords do not match');
@@ -39,16 +40,27 @@ export default function AuthPage() {
         setLoading(true);
         try {
             if (isLogin) {
-                await login(formData.email, formData.password);
+                console.log("Attempting login...");
+                const res = await login(formData.email, formData.password);
+                if (res && !res.success) {
+                    console.error("Login failed:", res.error);
+                    setError(res.error || 'Login failed');
+                }
             } else {
+                console.log("Attempting signup...");
                 if (!formData.name) {
                     setError('Please enter your full name');
                     setLoading(false);
                     return;
                 }
-                await signup(formData.name, formData.email, formData.password);
+                const res = await signup(formData.name, formData.email, formData.password);
+                if (res && !res.success) {
+                    console.error("Signup failed:", res.error);
+                    setError(res.error || 'Signup failed');
+                }
             }
         } catch (err) {
+            console.error("Auth Exception:", err);
             setError('Authentication failed. Please try again.');
         }
         setLoading(false);
