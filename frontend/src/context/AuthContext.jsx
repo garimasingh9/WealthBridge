@@ -265,6 +265,10 @@ export function AuthProvider({ children }) {
     };
 
     const googleLogin = async () => {
+        if (!auth) {
+            console.error("Firebase Auth is null. Cannot perform Google Sign-In. Check your .env configuration.");
+            return { success: false, error: "Firebase is not properly initialized." };
+        }
         try {
             let result;
             try {
