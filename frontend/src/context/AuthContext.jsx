@@ -1,4 +1,6 @@
 import { createContext, useContext, useState, useEffect } from 'react';
+import { auth, googleProvider } from '../firebase';
+import { signInWithPopup, signInWithRedirect, getRedirectResult } from 'firebase/auth';
 
 const API = import.meta.env.VITE_API_URL || 'http://localhost:8080';
 
@@ -87,6 +89,29 @@ export function AuthProvider({ children }) {
     // Initial load
     useEffect(() => {
         const loadUser = async () => {
+            try {
+                // Check for redirect result first
+                const redirectResult = await getRedirectResult(auth).catch(err => {
+                    console.error("Redirect error", err);
+                    return null;
+                });
+                
+                if (redirectResult) {
+                    const firebaseUser = redirectResult.user;
+                    const userData = { id: firebaseUser.uid, name: firebaseUser.displayName || 'Google User', email: firebaseUser.email };
+                    localStorage.setItem('wb-token', firebaseUser.accessToken);
+                    localStorage.setItem('wb-user', JSON.stringify(userData));
+                    
+                    setUser(userData);
+                    setIsAuthenticated(true);
+                    setFinancialData(INITIAL_FINANCIAL_DATA);
+                    setIsLoading(false);
+                    return;
+                }
+            } catch (error) {
+                console.error("Error during redirect check:", error);
+            }
+
             const token = localStorage.getItem('wb-token');
             if (token) {
                 try {
@@ -237,6 +262,39 @@ export function AuthProvider({ children }) {
         localStorage.removeItem('wb-user');
     };
 
+    const googleLogin = async () => {
+        try {
+            let result;
+            try {
+                result = await signInWithPopup(auth, googleProvider);
+            } catch (popupError) {
+                console.error("Popup failed, trying redirect:", popupError);
+                if (popupError.code === 'auth/popup-blocked' || popupError.code === 'auth/popup-closed-by-user' || popupError.code === 'auth/cross-origin-isolated') {
+                    await signInWithRedirect(auth, googleProvider);
+                    return { success: false, pendingRedirect: true };
+                }
+                throw popupError;
+            }
+
+            const firebaseUser = result.user;
+            
+            // For now, we simulate backend logic like the normal login fallback does
+            const userData = { id: firebaseUser.uid, name: firebaseUser.displayName || 'Google User', email: firebaseUser.email };
+            console.log("Google Login successful. User info:", userData);
+            localStorage.setItem('wb-token', firebaseUser.accessToken);
+            localStorage.setItem('wb-user', JSON.stringify(userData));
+            
+            setUser(userData);
+            setIsAuthenticated(true);
+            setFinancialData(INITIAL_FINANCIAL_DATA);
+            
+            return { success: true };
+        } catch (error) {
+            console.error("Google Login Error:", error);
+            return { success: false, error: error.message };
+        }
+    };
+
     const updateFinancialData = async (newData) => {
         // Optimistic update
         setFinancialData(prev => {
@@ -369,6 +427,7 @@ export function AuthProvider({ children }) {
             login,
             signup,
             logout,
+            googleLogin,
             updateFinancialData,
             addGoal,
             updateGoal,
