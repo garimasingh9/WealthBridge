@@ -120,11 +120,11 @@ export default function AuthPage() {
                             <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-primary-500 to-accent-500 flex items-center justify-center shadow-lg shadow-primary-500/30">
                                 <TrendingUp className="w-7 h-7 text-white" />
                             </div>
-                            <h1 className="text-4xl font-heading font-bold text-white dark:text-white">
+                            <h1 className="text-4xl font-heading font-bold text-dark-900 dark:text-white">
                                 Wealth<span className="gradient-text">Bridge</span>
                             </h1>
                         </div>
-                        <p className="text-lg text-white/70 dark:text-white/60 max-w-md mx-auto lg:mx-0 font-body animate-slide-up" style={{ animationDelay: '0.1s' }}>
+                        <p className="text-lg text-dark-600 dark:text-white/60 max-w-md mx-auto lg:mx-0 font-body animate-slide-up" style={{ animationDelay: '0.1s' }}>
                             Your intelligent financial mentor for smarter money decisions every day.
                         </p>
                     </div>
@@ -134,12 +134,12 @@ export default function AuthPage() {
                         {features.map((feature, i) => (
                             <div
                                 key={i}
-                                className="glass rounded-xl p-4 hover:bg-white/20 transition-all duration-300 cursor-default animate-slide-up"
+                                className="glass dark:glass rounded-xl p-4 hover:bg-white/50 dark:hover:bg-white/20 transition-all duration-300 cursor-default animate-slide-up"
                                 style={{ animationDelay: `${0.2 + i * 0.1}s` }}
                             >
-                                <div className="text-primary-300 mb-2">{feature.icon}</div>
-                                <h3 className="text-white font-semibold text-sm font-heading">{feature.title}</h3>
-                                <p className="text-white/50 text-xs mt-1">{feature.desc}</p>
+                                <div className="text-primary-600 dark:text-primary-300 mb-2">{feature.icon}</div>
+                                <h3 className="text-dark-900 dark:text-white font-semibold text-sm font-heading">{feature.title}</h3>
+                                <p className="text-dark-500 dark:text-white/50 text-xs mt-1">{feature.desc}</p>
                             </div>
                         ))}
                     </div>
@@ -147,14 +147,14 @@ export default function AuthPage() {
 
                 {/* Right side - Auth Card */}
                 <div className="w-full max-w-md animate-slide-up" style={{ animationDelay: '0.3s' }}>
-                    <div className={`${theme === 'dark' ? 'glass-dark' : 'glass'} rounded-3xl p-8 space-y-6`}>
+                    <div className={`${theme === 'dark' ? 'glass-dark' : 'bg-white/80 backdrop-blur-xl border border-dark-100 shadow-2xl'} rounded-3xl p-8 space-y-6`}>
                         {/* Toggle tabs */}
-                        <div className="flex bg-white/10 rounded-xl p-1">
+                        <div className="flex bg-dark-50/50 dark:bg-white/10 rounded-xl p-1">
                             <button
                                 onClick={() => { setIsLogin(true); setError(''); }}
                                 className={`flex-1 py-2.5 rounded-lg font-semibold text-sm transition-all duration-300 ${isLogin
                                         ? 'bg-gradient-to-r from-primary-600 to-primary-500 text-white shadow-lg'
-                                        : 'text-white/60 hover:text-white'
+                                        : 'text-dark-500 dark:text-white/60 hover:text-dark-900 dark:hover:text-white'
                                     }`}
                                 id="login-tab"
                             >
@@ -164,7 +164,7 @@ export default function AuthPage() {
                                 onClick={() => { setIsLogin(false); setError(''); }}
                                 className={`flex-1 py-2.5 rounded-lg font-semibold text-sm transition-all duration-300 ${!isLogin
                                         ? 'bg-gradient-to-r from-primary-600 to-primary-500 text-white shadow-lg'
-                                        : 'text-white/60 hover:text-white'
+                                        : 'text-dark-500 dark:text-white/60 hover:text-dark-900 dark:hover:text-white'
                                     }`}
                                 id="signup-tab"
                             >
@@ -173,10 +173,10 @@ export default function AuthPage() {
                         </div>
 
                         <div>
-                            <h2 className="text-2xl font-heading font-bold text-white">
+                            <h2 className="text-2xl font-heading font-bold text-dark-900 dark:text-white">
                                 {isLogin ? 'Welcome Back!' : 'Create Account'}
                             </h2>
-                            <p className="text-white/50 text-sm mt-1">
+                            <p className="text-dark-500 dark:text-white/50 text-sm mt-1">
                                 {isLogin ? 'Sign in to access your financial dashboard' : 'Start your journey to financial wellness'}
                             </p>
                         </div>
@@ -190,47 +190,47 @@ export default function AuthPage() {
                         <form onSubmit={handleSubmit} className="space-y-4">
                             {!isLogin && (
                                 <div className="relative animate-slide-up">
-                                    <User className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-white/40" />
+                                    <User className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-dark-400 dark:text-white/40" />
                                     <input
                                         type="text"
                                         name="name"
                                         placeholder="Full Name"
                                         value={formData.name}
                                         onChange={handleChange}
-                                        className="w-full pl-11 pr-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-primary-500/50 focus:border-primary-500 transition-all duration-300"
+                                        className="w-full pl-11 pr-4 py-3 bg-dark-50/50 dark:bg-white/10 border border-dark-200 dark:border-white/20 rounded-xl text-dark-900 dark:text-white placeholder-dark-400 dark:placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-primary-500/50 focus:border-primary-500 transition-all duration-300"
                                         id="signup-name"
                                     />
                                 </div>
                             )}
 
                             <div className="relative">
-                                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-white/40" />
+                                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-dark-400 dark:text-white/40" />
                                 <input
                                     type="email"
                                     name="email"
                                     placeholder="Email Address"
                                     value={formData.email}
                                     onChange={handleChange}
-                                    className="w-full pl-11 pr-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-primary-500/50 focus:border-primary-500 transition-all duration-300"
+                                    className="w-full pl-11 pr-4 py-3 bg-dark-50/50 dark:bg-white/10 border border-dark-200 dark:border-white/20 rounded-xl text-dark-900 dark:text-white placeholder-dark-400 dark:placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-primary-500/50 focus:border-primary-500 transition-all duration-300"
                                     id="auth-email"
                                 />
                             </div>
 
                             <div className="relative">
-                                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-white/40" />
+                                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-dark-400 dark:text-white/40" />
                                 <input
                                     type={showPassword ? 'text' : 'password'}
                                     name="password"
                                     placeholder="Password"
                                     value={formData.password}
                                     onChange={handleChange}
-                                    className="w-full pl-11 pr-12 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-primary-500/50 focus:border-primary-500 transition-all duration-300"
+                                    className="w-full pl-11 pr-12 py-3 bg-dark-50/50 dark:bg-white/10 border border-dark-200 dark:border-white/20 rounded-xl text-dark-900 dark:text-white placeholder-dark-400 dark:placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-primary-500/50 focus:border-primary-500 transition-all duration-300"
                                     id="auth-password"
                                 />
                                 <button
                                     type="button"
                                     onClick={() => setShowPassword(!showPassword)}
-                                    className="absolute right-3 top-1/2 -translate-y-1/2 text-white/40 hover:text-white/70 transition-colors"
+                                    className="absolute right-3 top-1/2 -translate-y-1/2 text-dark-400 dark:text-white/40 hover:text-dark-700 dark:hover:text-white/70 transition-colors"
                                 >
                                     {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                                 </button>
@@ -238,14 +238,14 @@ export default function AuthPage() {
 
                             {!isLogin && (
                                 <div className="relative animate-slide-up">
-                                    <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-white/40" />
+                                    <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-dark-400 dark:text-white/40" />
                                     <input
                                         type="password"
                                         name="confirmPassword"
                                         placeholder="Confirm Password"
                                         value={formData.confirmPassword}
                                         onChange={handleChange}
-                                        className="w-full pl-11 pr-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-primary-500/50 focus:border-primary-500 transition-all duration-300"
+                                        className="w-full pl-11 pr-4 py-3 bg-dark-50/50 dark:bg-white/10 border border-dark-200 dark:border-white/20 rounded-xl text-dark-900 dark:text-white placeholder-dark-400 dark:placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-primary-500/50 focus:border-primary-500 transition-all duration-300"
                                         id="signup-confirm-password"
                                     />
                                 </div>
@@ -270,9 +270,9 @@ export default function AuthPage() {
 
                         {/* Divider */}
                         <div className="flex items-center gap-4">
-                            <div className="flex-1 h-px bg-white/20" />
-                            <span className="text-white/40 text-xs">OR</span>
-                            <div className="flex-1 h-px bg-white/20" />
+                            <div className="flex-1 h-px bg-dark-200 dark:bg-white/20" />
+                            <span className="text-dark-400 dark:text-white/40 text-xs">OR</span>
+                            <div className="flex-1 h-px bg-dark-200 dark:bg-white/20" />
                         </div>
 
                         {/* Google OAuth */}
@@ -280,7 +280,7 @@ export default function AuthPage() {
                             type="button"
                             onClick={handleGoogleLogin}
                             disabled={loading}
-                            className="w-full py-3 bg-white/10 hover:bg-white/20 border border-white/20 rounded-xl text-white font-medium flex items-center justify-center gap-3 transition-all duration-300 disabled:opacity-50"
+                            className="w-full py-3 bg-dark-50/50 dark:bg-white/10 hover:bg-dark-100 dark:hover:bg-white/20 border border-dark-200 dark:border-white/20 rounded-xl text-dark-900 dark:text-white font-medium flex items-center justify-center gap-3 transition-all duration-300 disabled:opacity-50"
                             id="google-auth"
                         >
                             <svg className="w-5 h-5" viewBox="0 0 24 24">
@@ -293,9 +293,9 @@ export default function AuthPage() {
                         </button>
 
                         {isLogin && (
-                            <p className="text-center text-white/40 text-sm">
+                            <p className="text-center text-dark-500 dark:text-white/40 text-sm">
                                 Forgot your password?{' '}
-                                <button className="text-primary-400 hover:text-primary-300 transition-colors">Reset here</button>
+                                <button className="text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300 transition-colors">Reset here</button>
                             </p>
                         )}
                     </div>
