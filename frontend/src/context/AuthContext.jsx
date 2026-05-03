@@ -265,13 +265,14 @@ export function AuthProvider({ children }) {
     };
 
     const googleLogin = async () => {
-        if (!auth) {
-            console.error("Firebase Auth is null. Cannot perform Google Sign-In. Check your .env configuration.");
-            return { success: false, error: "Firebase is not properly initialized." };
-        }
         try {
             let result;
             try {
+                // Ensure auth is initialized before popup to prevent "null app" error
+                if (!auth) {
+                    console.error("Auth object is null. Please restart Vite server to load .env variables.");
+                    return { success: false, error: "Authentication service unavailable. Please try again." };
+                }
                 result = await signInWithPopup(auth, googleProvider);
             } catch (popupError) {
                 console.error("Popup failed, trying redirect:", popupError);
