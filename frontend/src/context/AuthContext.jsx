@@ -152,7 +152,7 @@ export function AuthProvider({ children }) {
             return { success: true };
         } catch (error) {
             console.error("Login Error:", error);
-            return { success: false, error: 'Invalid credentials or login failed' };
+            return { success: false, error: error.message };
         }
     };
 
