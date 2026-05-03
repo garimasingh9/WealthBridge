@@ -1,6 +1,6 @@
 import { createContext, useContext, useState, useEffect } from 'react';
 import { auth, googleProvider } from '../firebase';
-import { signInWithPopup, signInWithRedirect, getRedirectResult } from 'firebase/auth';
+import { signInWithPopup, signInWithRedirect, onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword, updateProfile, signOut } from 'firebase/auth';
 
 const API = import.meta.env.VITE_API_URL || 'http://localhost:8080';
 
@@ -88,52 +88,33 @@ export function AuthProvider({ children }) {
 
     // Initial load
     useEffect(() => {
-        const loadUser = async () => {
-            try {
-                // Check for redirect result first
-                if (auth) {
-                    const redirectResult = await getRedirectResult(auth).catch(err => {
-                        console.error("Redirect error", err);
-                        return null;
-                    });
-                    
-                    if (redirectResult) {
-                        const firebaseUser = redirectResult.user;
-                        const userData = { id: firebaseUser.uid, name: firebaseUser.displayName || 'Google User', email: firebaseUser.email };
-                        localStorage.setItem('wb-token', firebaseUser.accessToken);
-                        localStorage.setItem('wb-user', JSON.stringify(userData));
-                        
-                        setUser(userData);
-                        setIsAuthenticated(true);
-                        setFinancialData(INITIAL_FINANCIAL_DATA);
-                        setIsLoading(false);
-                        return;
-                    }
-                }
-            } catch (error) {
-                console.error("Error during redirect check:", error);
-            }
+        if (!auth) {
+            setIsLoading(false);
+            return;
+        }
 
-            const token = localStorage.getItem('wb-token');
-            if (token) {
+        const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
+            if (firebaseUser) {
+                setUser(firebaseUser);
+                setIsAuthenticated(true);
+                
                 try {
-                    // We'll set authenticated for now, but in a real app we'd validate the token with the backend
-                    const userDataStr = localStorage.getItem('wb-user');
-                    if (userDataStr) {
-                        setUser(JSON.parse(userDataStr));
-                        setIsAuthenticated(true);
-                        await fetchFinancialData(token);
-                    } else {
-                        logout();
-                    }
-                } catch (error) {
-                    console.error("Error loading user:", error);
-                    logout();
+                    const token = await firebaseUser.getIdToken();
+                    localStorage.setItem('wb-token', token);
+                    await fetchFinancialData(token);
+                } catch (e) {
+                    console.error("Error fetching financial data:", e);
                 }
+            } else {
+                setUser(null);
+                setIsAuthenticated(false);
+                setFinancialData(INITIAL_FINANCIAL_DATA);
+                localStorage.removeItem('wb-token');
             }
             setIsLoading(false);
-        };
-        loadUser();
+        });
+
+        return () => unsubscribe();
     }, []);
 
     const fetchFinancialData = async (token) => {
@@ -172,96 +153,47 @@ export function AuthProvider({ children }) {
 
     const login = async (email, password) => {
         try {
-            const response = await fetch(`${API}/api/auth/login`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ email, password })
-            });
-
-            if (response.ok) {
-                const data = await response.json();
-                localStorage.setItem('wb-token', data.token);
-
-                const userData = { id: data.id, name: data.fullName, email: data.email };
-                localStorage.setItem('wb-user', JSON.stringify(userData));
-
-                setUser(userData);
-                setIsAuthenticated(true);
-
-                await fetchFinancialData(data.token);
-                return { success: true };
-            } else {
-                return { success: false, error: 'Invalid credentials' };
-            }
+            await signInWithEmailAndPassword(auth, email, password);
+            return { success: true };
         } catch (error) {
             console.error("Login Error:", error);
-
-            // Fallback for demo when backend is down
-            console.log("Backend offline, using fallback login");
-            const userData = { id: 1, name: "Test User", email };
-            localStorage.setItem('wb-token', 'demo-token');
-            localStorage.setItem('wb-user', JSON.stringify(userData));
-            setUser(userData);
-            setIsAuthenticated(true);
-            setFinancialData(INITIAL_FINANCIAL_DATA);
-            return { success: true };
+            return { success: false, error: 'Invalid credentials or login failed' };
         }
     };
 
     const signup = async (name, email, password) => {
         try {
-            const response = await fetch(`${API}/api/auth/signup`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ fullName: name, email, password })
+            const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+            await updateProfile(userCredential.user, { displayName: name });
+            
+            // Force state update to reflect new displayName immediately
+            setUser({ ...userCredential.user, displayName: name });
+
+            const token = await userCredential.user.getIdToken();
+            
+            // Initialize empty profile in backend
+            await fetch(`${API}/api/profile`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                body: JSON.stringify({
+                    monthlyIncome: 0, monthlyExpenses: 0, currentSavings: 0,
+                    age: 25, familySize: 1, hasInsurance: false
+                })
             });
 
-            if (response.ok) {
-                const data = await response.json();
-                localStorage.setItem('wb-token', data.token);
-
-                const userData = { id: data.id, name: data.fullName, email: data.email };
-                localStorage.setItem('wb-user', JSON.stringify(userData));
-
-                setUser(userData);
-                setIsAuthenticated(true);
-
-                // Initialize empty profile in backend
-                await fetch(`${API}/api/profile`, {
-                    method: 'PUT',
-                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${data.token}` },
-                    body: JSON.stringify({
-                        monthlyIncome: 0, monthlyExpenses: 0, currentSavings: 0,
-                        age: 25, familySize: 1, hasInsurance: false
-                    })
-                });
-
-                setFinancialData(INITIAL_FINANCIAL_DATA);
-                return { success: true };
-            } else {
-                return { success: false, error: 'Signup failed' };
-            }
+            return { success: true };
         } catch (error) {
             console.error("Signup Error:", error);
-
-            // Fallback for demo when backend is down
-            console.log("Backend offline, using fallback signup");
-            const userData = { id: 1, name, email };
-            localStorage.setItem('wb-token', 'demo-token');
-            localStorage.setItem('wb-user', JSON.stringify(userData));
-            setUser(userData);
-            setIsAuthenticated(true);
-            setFinancialData(INITIAL_FINANCIAL_DATA);
-            return { success: true };
+            return { success: false, error: error.message };
         }
     };
 
-    const logout = () => {
-        setUser(null);
-        setIsAuthenticated(false);
-        setFinancialData(INITIAL_FINANCIAL_DATA);
-        localStorage.removeItem('wb-token');
-        localStorage.removeItem('wb-user');
+    const logout = async () => {
+        try {
+            await signOut(auth);
+        } catch (error) {
+            console.error("Logout error:", error);
+        }
     };
 
     const googleLogin = async () => {
@@ -283,18 +215,7 @@ export function AuthProvider({ children }) {
                 throw popupError;
             }
 
-            const firebaseUser = result.user;
-            
-            // For now, we simulate backend logic like the normal login fallback does
-            const userData = { id: firebaseUser.uid, name: firebaseUser.displayName || 'Google User', email: firebaseUser.email };
-            console.log("Google Login successful. User info:", userData);
-            localStorage.setItem('wb-token', firebaseUser.accessToken);
-            localStorage.setItem('wb-user', JSON.stringify(userData));
-            
-            setUser(userData);
-            setIsAuthenticated(true);
-            setFinancialData(INITIAL_FINANCIAL_DATA);
-            
+            // onAuthStateChanged will handle setting the user
             return { success: true };
         } catch (error) {
             console.error("Google Login Error:", error);

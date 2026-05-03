@@ -82,11 +82,11 @@ export default function DashboardLayout() {
                 <div className="p-4 border-t border-dark-100 dark:border-dark-800">
                     <div className="flex items-center gap-3 mb-3 p-3 rounded-xl bg-primary-50/50 dark:bg-primary-500/10">
                         <div className="w-10 h-10 rounded-full bg-gradient-to-br from-primary-500 to-accent-500 flex items-center justify-center text-white font-semibold text-sm">
-                            {user?.name?.charAt(0) || 'U'}
+                            {user?.displayName?.charAt(0) || 'U'}
                         </div>
                         <div className="flex-1 min-w-0">
-                            <p className="text-sm font-semibold text-dark-900 dark:text-white truncate">{user?.name || 'User'}</p>
-                            <p className="text-xs text-dark-400 truncate">{user?.email || 'user@email.com'}</p>
+                            <p className="text-sm font-semibold text-dark-900 dark:text-white truncate">{user?.displayName || 'User'}</p>
+                            <p className="text-xs text-dark-400 truncate">{user?.email}</p>
                         </div>
                     </div>
                     <button

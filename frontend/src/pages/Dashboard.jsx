@@ -102,7 +102,7 @@ export default function Dashboard() {
             <div className="animate-fade-in flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div>
                     <h1 className="text-3xl font-heading font-bold text-dark-900 dark:text-white">
-                        Welcome back, <span className="gradient-text">{user?.name?.split(' ')[0] || 'User'}</span> 👋
+                        Welcome back, <span className="gradient-text">{user?.displayName?.split(' ')[0] || 'User'}</span> 👋
                     </h1>
                     <p className="text-dark-500 dark:text-dark-400 mt-1">Here's your financial overview for this month</p>
                 </div>
